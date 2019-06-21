@@ -1,9 +1,4 @@
 '''
-TODO:
-Write a way to check all possible plays
-Code more cards to accelerate gameplay
-Add more features to HearthCards to allow these cards to work
-
 FEATURES TO ADD TO HEARTHCARDS:
 Rush
 Choose One
@@ -12,8 +7,7 @@ Current system only allows drawing / targeting from battlecries and spell effect
 Silence (currently removes all effects; may cause problems with copying)
 '''
 import HearthCards as hc
-import TestPlays as test
-import Ai as ai
+#import TestPlays as test
 
 myClass = "Druid"
 oppClass = "Mage"
@@ -22,8 +16,6 @@ me.mana += 1
 me.maxMana += 1
 opp = hc.Hero(oppClass)
 field = hc.Game(me,opp)
-
-alg = ai.train_model(0.1,1000)
 
 def findName(name,arr):
   if name == 'face':
@@ -126,6 +118,7 @@ def play(cmd):
     print("Not enough mana.")
     return 
 
+  args = []
   #Handle targeting effects, or set target to None
   if 'Target' in card.effects:
     target = splitCommand(input('Enter target: '))
@@ -136,6 +129,7 @@ def play(cmd):
       return
   else:
     target = None
+  args.append(target)
   #Handle draw effects
   if 'Draw' in card.effects:
     draw = []
@@ -163,9 +157,13 @@ def play(cmd):
       i += 1
   else:
     draw = None
+  args.append(draw)
+  
+  while len(args) < 3:
+    args.append(None)
 
   #Play the actual card
-  if field.playCard(card,target,position,draw):
+  if field.playCard(card,args[0],position,args[1]):
     print('Played '+card.name+'.')
   else:
     print('Card failed for unknown reason.')
@@ -279,11 +277,6 @@ def remove(cmd):
     return
   field.kill(minion,False)
   print('Removed',minion.name+'.')
-
-def testAll(cmd):
-  results = test.playCards(field)
-  print(test.checkResults(results,field,alg))
-  return results
   
 #Dict of all possible comands
 commands = {
@@ -296,7 +289,6 @@ commands = {
   'discard': lambda cmd:discard(cmd),
   'attack': lambda cmd:attack(cmd),
   'mana': lambda cmd:mana(cmd),
-  'test': lambda cmd:testAll(cmd),
   'remove': lambda cmd:remove(cmd)
 }
 

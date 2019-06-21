@@ -147,7 +147,7 @@ def Bane_of_Doom(self,target,draw):
   if target.health <= 0:
     self.game.summon(draw[0])
   return True
-addSpell('Bane of Doom',5,'Warlock',['Spell','Draw','Target'],[lambda me,t,d:Bane_of_Doom(me,t,d),lambda n:1])
+addSpell('Bane of Doom',5,'Warlock',['Spell','Draw','Target'],[lambda me,t,d:Bane_of_Doom(me,t,d),{'Pool':'Random', 'Effects':['Demon']}])
 
 def Baron_Geddon(self):
   game = self.game
@@ -173,7 +173,7 @@ def Battle_Rage(self,draws):
   for i in draws:
     self.game.addToHand(i)
   return True
-addSpell('Battle Rage',2,'Warrior',['Spell','Draw'],[lambda me,draws:Battle_Rage(me,draws),lambda me:Battle_Rage_Count(me)])
+addSpell('Battle Rage',2,'Warrior',['Spell','Draw'],[lambda me,draws:Battle_Rage(me,draws),{'Pool':'myDeck', 'Count':lambda m:Battle_Rage_Count(m)}])
 
 #Still need to rework minion buffs, so won't code the immune here for now
 def Bestial_Wrath(self,target):
@@ -286,9 +286,7 @@ def Cairne_Deathrattle(self):
   self.game.summon(hc.Minion('Baine Bloodhoof',4,4,5),pos)
 addMinion('Cairne Bloodhoof',6,4,5,['Deathrattle'],[lambda me:Cairne_Deathrattle(me)])
 
-def Call_of_the_Void(self,draw):
-  self.game.addToHand(draw[0])
-addSpell('Call of the Void',1,'Warlock',['Spell','Draw'],[lambda me,d:Call_of_the_Void(me,d),lambda c:1])
+addSpell('Call of the Void',1,'Warlock',['Spell','Draw'],[lambda m,d:m.game.addToHand(d[0]),{'Pool':'Random','Effects':['Demon']}])
 
 def Greenskin_Battlecry(self):
   if self.game.checkWeapon(self.game.me):
@@ -395,7 +393,7 @@ def Divine_Favor_Count(self):
 def Divine_Favor(self,draws):
   for i in draws:
     self.game.addToHand(i)
-addSpell('Divine Favor',3,'Paladin',['Spell','Draw'],[lambda me,d:Divine_Favor(me,d),lambda me:Divine_Favor_Count(me)])
+addSpell('Divine Favor',3,'Paladin',['Spell','Draw'],[lambda me,d:Divine_Favor(me,d),{'Pool':'myDeck','Count':lambda m:Divine_Favor_Count(m)}])
 
 #Don't really have discard planned out
 addMinion('Doomguard',5,5,7,['Battlecry','Charge'],mClass='Warlock')
@@ -466,7 +464,7 @@ addMinion('Faceless Manipulator',5,3,3)
 def Far_Sight(self,draw):
   draw[0].buffCost -= 3
   return self.game.addToHand(draw[0])
-addSpell('Far Sight',3,'Shaman',['Spell','Draw'],[lambda m,d:Far_Sight(m,d),lambda me:1])
+addSpell('Far Sight',3,'Shaman',['Spell','Draw'],[lambda m,d:Far_Sight(m,d),{'Pool':'myDeck'}])
 
 def Felguard_Battlecry(self):
   game = self.game
@@ -558,7 +556,7 @@ def Harrison_Battlecry(self,draw):
       game.addToHand(i)
     return True
   return False
-addMinion('Harrison Jones',5,5,4,['Battlecry','Draw'],[lambda m,d:Harrison_Battlecry(m,d),lambda m:Harrison_Count(m)])
+addMinion('Harrison Jones',5,5,4,['Battlecry','Draw'],[lambda m,d:Harrison_Battlecry(m,d),{'Pool':'myDeck','Count':lambda m:Harrison_Count(m)}])
 
 #This always summons on the friendly side right now
 def Harvest_Golem_Deathrattle(self):
@@ -581,7 +579,7 @@ addSpell('Holy Fire',6,'Priest',['Spell','Target'],[lambda me,t:Holy_Fire(me,t)]
 
 def Holy_Wrath(self,target,draw):
   return self.game.damage(target,draw[0].cost,True)
-addSpell('Holy Wrath',5,'Paladin',['Spell','Draw','Target'],[lambda m,t,d:Holy_Wrath(m,t,d),lambda m:1])
+addSpell('Holy Wrath',5,'Paladin',['Spell','Draw','Target'],[lambda m,t,d:Holy_Wrath(m,t,d),{'Pool':'myDeck'}])
 
 def Hungry_Crab_Battlecry(self,target):
   if 'Murloc' in target.effects:
@@ -597,7 +595,7 @@ def Icicle(self,target,draw):
   self.game.damage(target,2)
   if 'Frozen' in target.effects:
     self.game.addToHand(draw[0])
-addSpell('Icicle',2,'Mage',['Spell','Draw','Target'],[lambda m,t,d:Icicle(m,t,d)])
+addSpell('Icicle',2,'Mage',['Spell','Draw','Target'],[lambda m,t,d:Icicle(m,t,d),{'Pool':'myDeck'}])
 
 def Illidan(self,origin):
   game = self.game
@@ -659,7 +657,7 @@ def Lay_On_Hands(self,target,draws):
   self.game.damage(target,-8)
   for i in draws:
     self.game.addToHand(i)
-addSpell('Lay on Hands',8,'Paladin',['Spell','Draw','Target'],[lambda m,t,d:Lay_On_Hands(m,t,d),lambda m:3])
+addSpell('Lay on Hands',8,'Paladin',['Spell','Draw','Target'],[lambda m,t,d:Lay_On_Hands(m,t,d),{'Pool':'myDeck','Count':lambda m:3}])
 
 def Leeroy_Battlecry(self):
   whelp =hc.Minion('Whelp',1,1,1,['Dragon'])
@@ -766,7 +764,7 @@ addMinion('Mind Control Tech',3,3,3,['Battlecry','Target'],[lambda m,t:MCTech_Ba
 def Mindgames(self,draw):
   self.game.summon(draw[0])
   return True
-addSpell('Mindgames',4,'Priest',['Spell','Draw'],[lambda m,d:Mindgames(m,d),lambda m:1])
+addSpell('Mindgames',4,'Priest',['Spell','Draw'],[lambda m,d:Mindgames(m,d),{'Pool':'oppDeck','Type':hc.Minion}])
 
 #Another secret
 addSpell('Mirror Entity',3,'Mage',['Secret'])
@@ -840,6 +838,7 @@ addMinion('Onyxia',9,8,8,['Battlecry'],[lambda m:Onyxia_Battlecry(m)])
 #Combo card alert
 addWeapon("Perdition's Blade",3,2,2,wClass='Rogue')
 
+#How to use opponent's class?
 def Pilfer(self,draw):
   self.game.addToHand(draw[0])
 addSpell('Pilfer',1,'Rogue',['Spell','Draw'],[lambda m,d:Pilfer(m,d),lambda m:1])
@@ -950,7 +949,7 @@ def Sense_Demons(self,draws):
   for i in draws:
     self.game.addToHand(i)
   return True
-addSpell('Sense Demons',3,'Warlock',['Spell','Draw'],[lambda m,d:Sense_Demons(m,d),lambda m:2])
+addSpell('Sense Demons',3,'Warlock',['Spell','Draw'],[lambda m,d:Sense_Demons(m,d),{'Pool':'myDeck','Count':lambda m:2,'Effects':['Demon']}])
 
 #Shadow Madness has a weird temporary effect
 addSpell('Shadow Madness',4,'Priest')
@@ -1012,7 +1011,7 @@ def Slam(self,target,draw):
   if(target.health > 0):
     self.game.addToHand(draw[0])
   return True
-addSpell('Slam',2,'Warrior',['Spell','Draw','Target'],[lambda m,t,d:Slam(m,t,d),lambda m:1])
+addSpell('Slam',2,'Warrior',['Spell','Draw','Target'],[lambda m,t,d:Slam(m,t,d),{'Pool':'myDeck'}])
 
 #Secret
 addSpell('Snake Trap',2,'Hunter',['Secret'])
@@ -1123,7 +1122,7 @@ def Thoughtsteal(self,draws):
     if self.game.addToHand(i):
       succ = True
   return succ
-addSpell('Thoughtsteal',3,'Priest',['Spell','Draw'],[lambda m,d:Thoughtsteal(m,d),lambda m:2])
+addSpell('Thoughtsteal',3,'Priest',['Spell','Draw'],[lambda m,d:Thoughtsteal(m,d),{'Pool':'oppDeck','Count':lambda m:2}])
 
 #Don't know how to take the additional input needed for Overspark to work; might just use an input here because I don't really need to predict this type of random effect.
 addMinion('Tinkmaster Overspark',3,3,3)
@@ -1139,7 +1138,7 @@ addMinion('Tirion Fordring',8,6,6,['Deathrattle','Divine Shield','Taunt'],[lambd
 
 def Tome_of_Intellect(self,draw):
   self.game.addToHand(draw[0])
-addSpell('Tome of Intellect',1,'Mage',['Spell','Draw'],[lambda m,d:Tome_of_Intellect(m,d),lambda m:1])
+addSpell('Tome of Intellect',1,'Mage',['Spell','Draw'],[lambda m,d:Tome_of_Intellect(m,d),{'Pool':'Random', 'Class':'Mage'}])
 
 def Twilight_Drake_Battlecry(self):
   game = self.game
@@ -1311,7 +1310,7 @@ def Ancestral_Healing(self,target):
   self.game.addEffect(target,'Taunt')
 addSpell('Ancestral Healing',0,'Shaman',['Spell','Target'],[lambda m,t:Ancestral_Healing(m,t)])
 
-#Need to add the animal companions as uncollectibles
+#Need to add the animal companions as uncollectibles; need to figure out how to draw them also
 def Animal_Companion(self,draw):
   self.game.summon(draw[0])
   return True
@@ -1327,7 +1326,7 @@ def Intellect(self,draws):
     if self.game.addToHand(i):
       succ = True
   return succ
-addSpell('Arcane Intellect',3,'Mage',['Spell','Draw'],[lambda m,d:Intellect(m,d),lambda m:2])
+addSpell('Arcane Intellect',3,'Mage',['Spell','Draw'],[lambda m,d:Intellect(m,d),{'Pool':'myDeck','Count':lambda m:2}])
 
 #3 random targets
 addSpell('Arcane Missiles',1,'Mage')
@@ -1424,7 +1423,7 @@ def Fan_of_Knives(self,draw):
   for i in self.game.oppBoard:
     self.game.damage(i,1,True)
   self.game.addToHand(draw[0])
-addSpell('Fan of Knives',3,'Rogue',['Spell','Draw'],[lambda m,d:Fan_of_Knives(m,d),lambda m:1])
+addSpell('Fan of Knives',3,'Rogue',['Spell','Draw'],[lambda m,d:Fan_of_Knives(m,d),{'Pool':'myDeck'}])
 
 addMinion('Fire Elemental',6,6,5,['Battlecry','Target'],[lambda m,t:m.game.damage(t,3)])
 
@@ -1470,7 +1469,7 @@ def Frostwolf_Warlord_Battlecry(self):
     self.game.buff(self,1,1)
 addMinion('Frostwolf Warlord',5,4,4,['Battlecry'],[lambda m:Frostwolf_Warlord_Battlecry(m)])
 
-addMinion('Gnomish Inventor',4,2,4,['Battlecry','Draw'],[lambda m,d:m.game.addToHand(d[0]),lambda m:1])
+addMinion('Gnomish Inventor',4,2,4,['Battlecry','Draw'],[lambda m,d:m.game.addToHand(d[0]),{'Pool':'myDeck'}])
 
 def Grimscale_Aura(self):
   for i in self.game.myBoard:
@@ -1490,7 +1489,7 @@ addMinion('Gurubashi Berserker',5,2,7,['Damage'],[lambda m,o:Gurubashi_Berserker
 def Hammer_of_Wrath(self,target,draw):
   self.game.damage(target,3,True)
   self.game.addToHand(draw[0])
-addSpell('Hammer of Wrath',4,'Paladin',['Spell','Draw','Target'],[lambda m,t,d:Hammer_of_Wrath(m,t,d),lambda m:1])
+addSpell('Hammer of Wrath',4,'Paladin',['Spell','Draw','Target'],[lambda m,t,d:Hammer_of_Wrath(m,t,d),{'Pool':'myDeck'}])
 
 addSpell('Hand of Protection',1,'Paladin',['Battlecry','Target'],[lambda m,t:m.game.addEffect(t,'Divine Shield')])
 
@@ -1576,7 +1575,7 @@ addSpell('Mind Control',10,'Priest',['Spell','Target'],[lambda m,t:Mind_Control(
 def Mind_Vision(self,draw):
   self.game.addToHand(draw[0])
   return True
-addSpell('Mind Vision',1,'Priest',['Spell','Draw'],[lambda m,d:Mind_Vision(m,d),lambda m:1])
+addSpell('Mind Vision',1,'Priest',['Spell','Draw'],[lambda m,d:Mind_Vision(m,d),{'Pool':'oppHand'}])
 
 def Mirror_Image(self):
   image =hc.Minion('Mirror Image',0,0,2,['Taunt'])
@@ -1591,7 +1590,7 @@ def Mortal_Coil(self,target,draw):
   self.game.damage(target,1,True)
   if target.health <= 0:
     self.game.addToHand(draw[0])
-addSpell('Mortal Coil',1,'Warlock',['Spell','Draw','Target'],[lambda m,t,d:Mortal_Coil(m,t,d),lambda m:1])
+addSpell('Mortal Coil',1,'Warlock',['Spell','Draw','Target'],[lambda m,t,d:Mortal_Coil(m,t,d),{'Pool':'myDeck'}])
 
 #Multiple random targets
 addSpell('Multi-Shot',4,'Hunter')
@@ -1607,7 +1606,7 @@ addMinion('Nightblade',5,4,4,['Battlecry'],[lambda m:m.game.damage(m.game.oppone
 #Draw effect outside of battlecry
 addMinion('Northshire Cleric',1,1,3,mClass='Priest')
 
-addMinion('Novice Engineer',2,1,1,['Battlecry','Draw'],[lambda m,d:m.game.addToHand(d[0]),lambda m:1])
+addMinion('Novice Engineer',2,1,1,['Battlecry','Draw'],[lambda m,d:m.game.addToHand(d[0]),{}])
 
 #How do i do transformations?????
 addSpell('Polymorph',4,'Mage')
@@ -1615,7 +1614,7 @@ addSpell('Polymorph',4,'Mage')
 def PW_Shield(self,target,draw):
   self.game.buff(target,0,2)
   self.game.addToHand(draw[0])
-addSpell('Power Word: Shield',1,'Priest',['Spell','Draw','Target'],[lambda m,t,d:PW_Shield(m,t,d),lambda m:1])
+addSpell('Power Word: Shield',1,'Priest',['Spell','Draw','Target'],[lambda m,t,d:PW_Shield(m,t,d),{}])
 
 def Raid_Leader_Aura(self):
   game = self.game
@@ -1687,13 +1686,13 @@ def Shield_Block(self,draw):
   self.game.me.armor += 5
   self.game.addToHand(draw[0])
   return True
-addSpell('Shield Block',3,'Warrior',['Spell','Draw'],[lambda m,d:Shield_Block(m,d),lambda m:1])
+addSpell('Shield Block',3,'Warrior',['Spell','Draw'],[lambda m,d:Shield_Block(m,d),{}])
 
 def Shiv(self,target,draw):
   self.game.damage(target,1,True)
   self.game.addToHand(draw[0])
   return True
-addSpell('Shiv',2,'Rogue',['Spell','Draw','Target'],[lambda m,t,d:Shiv(m,t,d),lambda m:1])
+addSpell('Shiv',2,'Rogue',['Spell','Draw','Target'],[lambda m,t,d:Shiv(m,t,d),{}])
 
 addSpell('Sinister Strike',1,'Rogue',['Spell'],[lambda m:m.game.damage(m.game.opponent,3,True)])
 
@@ -1702,7 +1701,7 @@ def Soulfire(self,target,draw):
   if draw[0] in self.game.myHand:
     self.game.discard(draw[0])
   return True
-addSpell('Soulfire',1,'Warlock',['Spell','Draw','Target'],[lambda m,t,d:Soulfire(m,t,d),lambda m:1])
+addSpell('Soulfire',1,'Warlock',['Spell','Draw','Target'],[lambda m,t,d:Soulfire(m,t,d),{'Pool':'myHand'}])
 
 def Sprint(self,draws):
   succ = False
@@ -1710,13 +1709,13 @@ def Sprint(self,draws):
     if self.game.addToHand(i):
       succ = True
   return succ
-addSpell('Sprint',7,'Rogue',['Spell','Draw'],[lambda m,d:Sprint(m,d),lambda m:4])
+addSpell('Sprint',7,'Rogue',['Spell','Draw'],[lambda m,d:Sprint(m,d),{'Count':lambda m:4}])
 
 def Starfire(self,target,draw):
   self.game.damage(target,5,True)
   self.game.addToHand(draw[0])
   return True
-addSpell('Starfire',6,'Druid',['Spell','Draw','Target'],[lambda m,t,d:Starfire(m,t,d),lambda m:1])
+addSpell('Starfire',6,'Druid',['Spell','Draw','Target'],[lambda m,t,d:Starfire(m,t,d),{}])
 
 #Draw effect but who cares starving buzzard is unplayable now
 addMinion('Starving Buzzard',5,3,2,['Beast'])
@@ -1735,7 +1734,7 @@ def Succubus_Battlecry(self,draw):
   if draw[0] in self.game.myHand:
     self.game.discard(draw[0])
   return True
-addMinion('Succubus',2,4,3,['Battlecry','Draw'],[lambda m,d:Succubus_Battlecry(m,d),lambda m:1],mClass='Warlock')
+addMinion('Succubus',2,4,3,['Battlecry','Draw'],[lambda m,d:Succubus_Battlecry(m,d),{'Pool':'myHand'}],mClass='Warlock')
 
 def Swipe(self,target):
   for i in self.game.oppBoard:
@@ -1756,6 +1755,7 @@ def Totemic_Might(self):
       self.game.buff(i,0,2)
 addSpell('Totemic Might',0,'Shaman',['Spell'],[lambda m:Totemic_Might(m)])
 
+#Weird draw spell
 addSpell('Tracking',1,'Hunter',['Spell','Draw'],[lambda m,d:m.game.addToHand(d[0]),lambda m:1])
 
 def Truesilver_Attack(self,target):
@@ -1844,23 +1844,16 @@ addMinion('Mechanical Dragonling',2,2,1,['Mech'])
 addMinion('Boar',1,1,1,['Beast'])
 addMinion('Murloc Scout',1,1,1,['Murloc'])
 
-#------------------Various cards from my deck------------------
-
-def Springpaw_Battlecry(self):
-  lynx = hc.Minion('Lynx',1,1,1,['Charge','Beast'])
-  self.game.addToHand(lynx)
-  return True
-addMinion('Springpaw',1,1,1,['Battlecry','Charge','Beast'],[lambda m:Springpaw_Battlecry(m)])
-
-def Headhunter_Battlecry(self):
-  beast = False
+#Animal companions
+def Leokk_Aura(self):
   for i in self.game.myBoard:
-    if 'Beast' in i.effects:
-      beast = True
-  if beast:
-    self.buffHealth += 1
-  return True
-addWeapon("Headhunter's Hatchet",2,2,2,['Battlecry'],[lambda m:Headhunter_Battlecry(m)])
+    if i != self:
+      i.auraAtk += 1
+addMinion('Huffer',3,4,2,['Charge','Beast'])
+addMinion('Misha',3,4,4,['Taunt','Beast'])
+addMinion('Leokk',3,2,4,['Aura','Beast'],[lambda m:Leokk_Aura(m)])
+
+#------------------Various cards from my deck------------------
 
 def Boisterous_Battlecry(self):
   for i in self.game.myBoard:

@@ -151,15 +151,15 @@ class Game:
     self.summonOrder = []
 
   #Run a specific effect of a card, if it has that effect
-  def runEffect(self,effect,card,target=None,draw=None,default=False,resolve=True):
+  def runEffect(self,effect,card,arg1=None,arg2=None,arg3=None,default=False,resolve=True):
     succ = default
     if effect in card.effects:
-      if target != None and draw != None:
-        succ = card.effects[effect](card,target,draw)
-      elif draw != None:
-        succ = card.effects[effect](card,draw)
-      elif target != None:
-        succ = card.effects[effect](card,target)
+      if arg3 != None and arg2 != None and arg1 != None:
+        succ = card.effects[effect](card,arg1,arg2,arg3)
+      elif arg2 != None and arg1 != None:
+        succ = card.effects[effect](card,arg1,arg2)
+      elif arg1 != None:
+        succ = card.effects[effect](card,arg1)
       else:
         succ = card.effects[effect](card)
     if succ and resolve: self.resolveDeath()
@@ -183,7 +183,9 @@ class Game:
   def addToHand(self,card,hand=None):
     if hand == None:
       hand = self.myHand
-    if(len(hand) < 10):
+    if self.runEffect('Casts When Drawn',card):
+      return True
+    elif(len(hand) < 10):
       card = copy.deepcopy(card)
       if not isinstance(card,Weapon):
         card.game = self
@@ -386,8 +388,8 @@ class Game:
 
   #Discard a card from the current hand
   def discard(self,card):
-    if not self.runEffect('Discard',card):
-      self.myHand.remove(card)
+    self.myHand.remove(card)
+    self.runEffect('Discard',card)
 
   #Find the minions adjacent to a specific minion
   def getAdjacent(self,minion):
@@ -423,6 +425,7 @@ class Game:
       return self.oppBoard.index(minion)
     return -1
 
+  #Return which board a minion is on
   def getBoard(self,minion):
     if minion in self.myBoard:
       return self.myBoard
@@ -432,4 +435,7 @@ class Game:
 
 #Take card definitions from other files
 import Classic
+import Rastakhan
 cardDefs = [i for i in Classic.cardDefs]
+for i in Rastakhan.cardDefs:
+  cardDefs.append(i)
