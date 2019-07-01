@@ -190,6 +190,7 @@ class Game:
       if not isinstance(card,Weapon):
         card.game = self
       hand.append(card)
+      self.checkAuras()
       return True
     return False
 
@@ -226,21 +227,22 @@ class Game:
     return True
 
   #Play a card; run battlecry or spell effect, targeting or not, then summon if it is a minion
-  def playCard(self,card,target=None,position=-1,draw=None):
+  def playCard(self,card,arg1=None,position=-1,arg2=None,arg3=None):
     if self.me.mana < card.cost: 
       return False
     succ = True
-    succ = self.runEffect('Spell',card,target,draw,succ)
+    succ = self.runEffect('Spell',card,arg1,arg2,arg3,succ)
     if isinstance(card,Minion):
       succ = self.summon(card,position)
     elif isinstance(card,Weapon):
       succ = self.equip(card)
     if succ:
-      succ = self.runEffect('Battlecry',card,target,draw,succ)
+      succ = self.runEffect('Battlecry',card,arg1,arg2,arg3,succ)
     if succ:
       self.runEffectAll('Play Card',card)
       self.myHand.remove(card)
       self.me.mana -= card.cost
+    self.checkAuras()
     return succ
   
   #Deal damage to a minion
@@ -286,10 +288,11 @@ class Game:
     elif minion in self.myBoard:
       self.runEffectAll('Death',minion)
       self.myBoard.remove(minion)
+      self.summonOrder.remove(minion)
     elif minion in self.oppBoard:
       self.runEffectAll('Death',minion)
       self.oppBoard.remove(minion)
-    self.summonOrder.remove(minion)
+      self.summonOrder.remove(minion)
     #Execute deathrattle, unless otherwise specified
     if dr:
       self.runEffect('Deathrattle',minion)

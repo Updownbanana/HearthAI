@@ -7,7 +7,7 @@ Current system only allows drawing / targeting from battlecries and spell effect
 Silence (currently removes all effects; may cause problems with copying)
 '''
 import HearthCards as hc
-#import TestPlays as test
+import TestPlays
 
 myClass = "Druid"
 oppClass = "Mage"
@@ -277,6 +277,11 @@ def remove(cmd):
     return
   field.kill(minion,False)
   print('Removed',minion.name+'.')
+
+#Print a list of all possible plays
+def test(cmd):
+  out = TestPlays.playCards(field)
+  print(out.keys())
   
 #Dict of all possible comands
 commands = {
@@ -289,7 +294,8 @@ commands = {
   'discard': lambda cmd:discard(cmd),
   'attack': lambda cmd:attack(cmd),
   'mana': lambda cmd:mana(cmd),
-  'remove': lambda cmd:remove(cmd)
+  'remove': lambda cmd:remove(cmd),
+  'test': lambda cmd:test(cmd)
 }
 
 while True:

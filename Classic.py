@@ -782,9 +782,9 @@ def Mortal_Strike(self,target):
 
 def Mountain_Giant_Aura(self):
   game = self.game
-  if self in game.myBoard:
+  if self in game.myHand:
     hand = game.myHand
-  elif self in game.oppBoard:
+  elif self in game.oppHand:
     hand = game.oppHand
   else:
     return False
